@@ -1,0 +1,12 @@
+# 忽略依賴套件 (這很重要，因為體積巨大)
+node_modules/
+
+# 忽略環境變數
+.env
+
+# 忽略日誌
+npm-debug.log*
+
+# 忽略系統暫存
+.DS_Store
+Thumbs.db

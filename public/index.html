@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="Big Two Pro Max - 專業級線上大老二對局系統">
+    <title>BIG TWO PRO MAX | 巔峰對決</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&family=Noto+Sans+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* 這裡放一些關鍵的載入動畫，確保頁面不閃爍 */
+        #loader {
+            position: fixed; inset: 0; background: #050505; 
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        .spinner {
+            width: 50px; height: 50px; border: 3px solid rgba(212, 175, 55, 0.3);
+            border-top-color: #d4af37; border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="loader"><div class="spinner"></div></div>
+
+    <div id="lobby" class="lobby-screen">
+        <div class="lobby-box">
+            <header class="title-area">
+                <h1>BIG TWO <span>PRO</span></h1>
+                <p>ULTIMATE MULTIPLAYER EXPERIENCE</p>
+            </header>
+
+            <div class="input-container">
+                <div class="field-group">
+                    <label for="nick">玩家暱稱</label>
+                    <input type="text" id="nick" placeholder="輸入戰鬥代號..." maxlength="10">
+                </div>
+                
+                <div class="field-group">
+                    <label for="rid">房間號碼</label>
+                    <input type="text" id="rid" placeholder="例如: 888" maxlength="6">
+                </div>
+
+                <div class="field-group">
+                    <label for="pwd">房間密碼 (選填)</label>
+                    <input type="password" id="pwd" placeholder="SECURITY KEY">
+                </div>
+            </div>
+
+            <div class="auth-btns">
+                <button class="btn-lobby join" onclick="handleAuth('join')">
+                    <span class="icon">➡️</span> 進入現有戰場
+                </button>
+                <button class="btn-lobby create" onclick="handleAuth('create')">
+                    <span class="icon">➕</span> 開創全新房間
+                </button>
+            </div>
+
+            <footer class="lobby-footer">
+                <small>v3.0.0 Global Edition | Server Status: <span id="server-status" style="color: #00ff00">Online</span></small>
+            </footer>
+        </div>
+    </div>
+
+    <div id="app" class="app-wrapper" style="display: none;">
+        
+        <header class="header-nav">
+            <div class="brand-logo">
+                <span class="gold-text">ROOM:</span>
+                <span id="room-id-display" class="id-badge">---</span>
+            </div>
+            
+            <div id="player-chips" class="player-status-row">
+                </div>
+
+            <div class="sys-controls">
+                <button class="icon-btn" title="設置" onclick="toggleSettings()">⚙️</button>
+            </div>
+        </header>
+
+        <section class="main-content">
+            
+            <aside class="side-panel">
+                <div class="log-header">
+                    <span class="log-title">對局實時紀錄</span>
+                    <button class="clear-btn" onclick="clearLogs()">清除</button>
+                </div>
+                <div id="log-list" class="log-box">
+                    </div>
+            </aside>
+
+            <main class="table-field">
+                <div id="system-hint" class="hint-banner">等待玩家入座中...</div>
+                
+                <div class="table-center">
+                    <div class="played-cards-wrapper">
+                        <div id="table-cards" class="card-group table-cards">
+                            </div>
+                    </div>
+                    <div id="move-type" class="move-type-badge">READY</div>
+                </div>
+
+                <div class="master-controls">
+                    <button id="start-btn" class="btn-primary-glow" style="display: none;" onclick="handleStart()">
+                        啟動對局 START GAME
+                    </button>
+                </div>
+
+                <div id="result-overlay" class="settlement-overlay" style="display: none;">
+                    <div class="result-content">
+                        <div class="crown-icon">👑</div>
+                        <h2 id="winner-text" class="result-title">WINNER!</h2>
+                        <div id="score-board" class="score-board">
+                            </div>
+                        <div class="result-actions">
+                            <button id="retry-btn" class="btn-lobby join" style="display: none;" onclick="handleStart()">
+                                再戰一局 PLAY AGAIN
+                            </button>
+                            <button class="btn-lobby create" onclick="location.reload()">
+                                離開房間 LEAVE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </section>
+
+        <section class="player-dashboard">
+            
+            <div class="quick-tools">
+                <div class="tool-group">
+                    <button class="tool-btn" onclick="smartPick('SINGLE')">單張</button>
+                    <button class="tool-btn" onclick="smartPick('PAIR')">對子</button>
+                    <button class="tool-btn" onclick="smartPick('HOUSE')">葫蘆</button>
+                    <button class="tool-btn" onclick="smartPick('STRAIGHT')">順子</button>
+                </div>
+                <div class="tool-divider"></div>
+                <div class="tool-group">
+                    <button class="tool-btn accent" onclick="sortCards()">自動排序</button>
+                    <button class="tool-btn accent" onclick="state.selectedCards=[]; renderHand();">取消選擇</button>
+                </div>
+            </div>
+
+            <div class="bottom-player-area">
+                <div id="hand-cards" class="card-group player-hand">
+                    </div>
+
+                <div class="action-row">
+                    <button id="pass-btn" class="btn-game pass" onclick="handlePass()" disabled>
+                        PASS <small>跳過此輪</small>
+                    </button>
+                    <button id="play-btn" class="btn-game play" onclick="handlePlay()" disabled>
+                        PLAY CARDS <small>出牌對決</small>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="notification-toast" class="toast"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/rule.js"></script>
+    <script src="js/app.js"></script>
+
+    <script>
+        // 頁面加載完成後隱藏 Loader
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 500);
+        });
+
+        // 輔助功能：清空日誌
+        function clearLogs() {
+            document.getElementById('log-list').innerHTML = '<div style="color: #555">日誌已清空</div>';
+        }
+
+        // 輔助功能：設定視窗 (模擬)
+        function toggleSettings() {
+            alert("專業版設置功能：\n1. 音效開關 (開發中)\n2. 牌背樣式切換\n3. 房間隱私設定");
+        }
+    </script>
+</body>
+</html>
