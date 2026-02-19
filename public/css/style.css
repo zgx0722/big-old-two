@@ -1,150 +1,270 @@
+/* --- 變數與基礎設定 --- */
 :root {
     --gold: #d4af37;
-    --gold-glow: rgba(212, 175, 55, 0.4);
-    --bg-deep: #050505;
-    --panel-bg: rgba(20, 20, 22, 0.95);
-    --glass: rgba(255, 255, 255, 0.03);
+    --gold-glow: rgba(212, 175, 55, 0.5);
+    --gold-linear: linear-gradient(135deg, #f6d365 0%, #d4af37 100%);
+    --bg-deep: #0a0a0c;
+    --panel-bg: rgba(25, 25, 28, 0.9);
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
     --accent: #00f2ff;
-    --card-red: #ff3e3e;
-    --card-white: #f8f8f8;
+    --card-red: #ff4757;
+    --card-black: #2f3542;
+    --card-white: #ffffff;
     --font-main: 'Montserrat', 'Noto Sans TC', sans-serif;
+    --safe-area-bottom: env(safe-area-inset-bottom);
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+    outline: none;
+}
+
 body {
-    margin: 0; background: var(--bg-deep); color: #fff;
-    font-family: var(--font-main); height: 100vh; overflow: hidden;
-    background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%);
+    margin: 0; 
+    background: var(--bg-deep); 
+    color: #e0e0e0;
+    font-family: var(--font-main); 
+    height: 100vh; 
+    height: 100dvh; /* 適應行動裝置動態高度 */
+    overflow: hidden;
+    background-image: 
+        radial-gradient(circle at 50% 10%, #1e272e 0%, #0a0a0c 100%);
 }
 
-/* 入口大廳螢幕 */
+/* --- 動畫定義 --- */
+@keyframes card-rise {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse-gold {
+    0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+/* --- 大廳畫面優化 --- */
 .lobby-screen {
-    height: 100vh; display: flex; align-items: center; justify-content: center;
-    animation: fadeIn 0.8s ease-out;
+    height: 100%; display: flex; align-items: center; justify-content: center;
+    padding: 20px;
 }
 
 .lobby-box {
-    background: var(--panel-bg); padding: 50px; border-radius: 30px;
-    width: 380px; border: 1px solid #333; box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-    text-align: center; backdrop-filter: blur(20px);
+    background: var(--panel-bg); 
+    padding: 40px 30px; 
+    border-radius: 24px;
+    width: 100%;
+    max-width: 400px; 
+    border: 1px solid var(--glass-border); 
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(15px);
 }
 
 .title-area h1 {
-    font-size: 2.5rem; font-weight: 900; letter-spacing: 8px; margin: 0;
-    background: linear-gradient(45deg, var(--gold), #fff);
+    font-size: 2.2rem; font-weight: 900; letter-spacing: 4px; margin: 0;
+    background: var(--gold-linear);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
 }
 
-.title-area p { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 30px; opacity: 0.6; }
+.field-group { margin-bottom: 20px; text-align: left; }
+.field-group label { 
+    display: block; font-size: 12px; color: var(--gold); 
+    margin-bottom: 8px; font-weight: 700; letter-spacing: 1px;
+}
 
 .input-container input {
-    width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px;
-    border: 1px solid #222; background: #000; color: #fff; text-align: center;
-    transition: 0.3s;
+    width: 100%; padding: 14px; border-radius: 12px;
+    border: 1px solid var(--glass-border); 
+    background: rgba(0,0,0,0.3); color: #fff; 
+    font-size: 1rem; transition: all 0.3s;
 }
 
-.input-container input:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 15px var(--gold-glow); }
-
-.auth-btns { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-
-.btn-lobby {
-    padding: 16px; border: none; border-radius: 12px; font-weight: bold;
-    cursor: pointer; transition: 0.4s; font-size: 1rem;
+.input-container input:focus { 
+    border-color: var(--gold); 
+    background: rgba(0,0,0,0.5);
+    box-shadow: 0 0 0 3px var(--gold-glow);
 }
 
-.btn-lobby.join { background: var(--gold); color: #000; }
-.btn-lobby.create { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
-.btn-lobby:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
-
-/* 遊戲主畫面佈局 */
-.app-wrapper { display: grid; grid-template-rows: 60px 1fr 200px; height: 100vh; }
+/* --- 遊戲主畫面佈局 --- */
+.app-wrapper { 
+    display: grid; 
+    grid-template-rows: auto 1fr auto; 
+    height: 100vh;
+    height: 100dvh;
+}
 
 .header-nav {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 25px; background: rgba(0,0,0,0.8); border-bottom: 1px solid #222;
+    padding: 10px 20px; background: rgba(0,0,0,0.6); 
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px); z-index: 100;
 }
 
-.player-status-row { display: flex; gap: 15px; }
+.id-badge {
+    background: var(--gold-linear); color: #000;
+    padding: 2px 10px; border-radius: 20px; font-weight: 900; font-size: 12px;
+}
+
+/* 玩家狀態標籤 */
+.player-status-row { display: flex; gap: 8px; }
 .p-tag {
-    padding: 6px 15px; background: var(--glass); border-radius: 8px;
-    font-size: 12px; border: 1px solid #333; transition: 0.3s;
+    padding: 5px 12px; background: var(--glass); border-radius: 6px;
+    font-size: 11px; border: 1px solid var(--glass-border); color: #888;
 }
-.p-tag.active { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
+.p-tag.active { 
+    border-color: var(--gold); color: #fff; 
+    background: var(--gold-glow);
+    animation: pulse-gold 2s infinite;
+}
 
-.main-content { display: grid; grid-template-columns: 240px 1fr; overflow: hidden; }
+/* --- 遊戲桌面區 --- */
+.main-content { 
+    display: grid; 
+    grid-template-columns: 220px 1fr; 
+    overflow: hidden; 
+}
 
 .side-panel {
-    background: rgba(10, 10, 10, 0.8); border-right: 1px solid #222;
+    background: rgba(0,0,0,0.2); 
+    border-right: 1px solid var(--glass-border);
     display: flex; flex-direction: column;
 }
 
-.log-title { padding: 15px; font-weight: bold; border-bottom: 1px solid #222; font-size: 12px; color: var(--gold); }
-.log-box { flex: 1; padding: 15px; font-size: 11px; overflow-y: auto; color: #aaa; line-height: 1.8; }
+.log-box { 
+    flex: 1; padding: 15px; font-size: 11px; overflow-y: auto; 
+    color: #999; line-height: 1.6;
+    mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
 
 .table-field {
     position: relative; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; overflow: hidden;
+    align-items: center; justify-content: center;
+    background: radial-gradient(circle at center, #1a472a 0%, #0a0a0c 70%); /* 經典深綠桌布感 */
 }
 
-.hint-banner {
-    position: absolute; top: 30px; font-size: 14px; letter-spacing: 2px;
-    color: var(--accent); text-transform: uppercase;
+/* 出牌區域 */
+.table-center {
+    min-height: 180px; display: flex; flex-direction: column; 
+    align-items: center; justify-content: center;
 }
 
-/* 撲克牌組 */
-.card-group { display: flex; justify-content: center; perspective: 1000px; }
+.move-type-badge {
+    margin-top: 15px; padding: 4px 15px; border-radius: 4px;
+    font-size: 12px; background: rgba(255,255,255,0.1);
+    letter-spacing: 2px; color: var(--gold);
+}
+
+/* --- 撲克牌樣式優化 --- */
+.card-group { display: flex; justify-content: center; }
+
 .poker-card {
-    width: 65px; height: 92px; background: var(--card-white); border-radius: 10px;
-    margin-left: -30px; color: #000; position: relative;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer; user-select: none; border: 1px solid #ccc;
+    width: 70px; height: 100px; 
+    background: var(--card-white); border-radius: 8px;
+    margin-left: -35px; color: var(--card-black); position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+    transition: transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28), box-shadow 0.2s;
+    cursor: pointer; overflow: hidden;
+    border: 1px solid #ddd;
+    animation: card-rise 0.4s ease-out;
 }
 
-.poker-card:hover { transform: translateY(-10px) rotate(2deg); z-index: 10; }
-.poker-card.selected { transform: translateY(-35px); border: 3px solid var(--gold); box-shadow: 0 0 20px var(--gold-glow); }
+.poker-card:first-child { margin-left: 0; }
+
+.poker-card.selected { 
+    transform: translateY(-25px) !important; 
+    border: 3px solid var(--gold);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4), 0 0 15px var(--gold-glow);
+}
+
 .poker-card.red { color: var(--card-red); }
 
-.poker-card .val { font-size: 1.8rem; font-weight: 900; position: absolute; top: 5px; left: 8px; }
-.poker-card .suit-mini { position: absolute; top: 5px; right: 8px; font-size: 1.1rem; }
-.poker-card .suit-big { position: absolute; bottom: 5px; right: 8px; font-size: 2.5rem; opacity: 0.15; }
+/* 牌面數位與花色 */
+.poker-card .val { font-size: 1.4rem; font-weight: 900; position: absolute; top: 4px; left: 6px; line-height: 1; }
+.poker-card .suit-mini { position: absolute; top: 6px; right: 6px; font-size: 0.9rem; }
+.poker-card .suit-big { 
+    position: absolute; bottom: -5px; right: -5px; 
+    font-size: 3.5rem; opacity: 0.08; transform: rotate(-10deg);
+}
 
-/* 工具與控制區 */
+/* --- 底部操作區 --- */
+.player-dashboard {
+    background: var(--panel-bg);
+    border-top: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    padding-bottom: var(--safe-area-bottom);
+}
+
 .quick-tools {
-    display: flex; gap: 8px; padding: 10px; background: #000; overflow-x: auto;
-    justify-content: center; border-top: 1px solid #222;
+    display: flex; gap: 6px; padding: 10px; 
+    background: rgba(0,0,0,0.4); justify-content: center;
+    border-bottom: 1px solid var(--glass-border);
 }
 
 .tool-btn {
-    padding: 8px 18px; background: #1a1a1a; border: 1px solid #333;
-    color: #eee; border-radius: 6px; cursor: pointer; font-size: 11px;
+    padding: 6px 12px; background: var(--glass); border: 1px solid var(--glass-border);
+    color: #ccc; border-radius: 6px; font-size: 11px; font-weight: 600;
+    transition: 0.2s;
+}
+.tool-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+.tool-btn.accent { border-color: var(--gold); color: var(--gold); }
+
+.bottom-player-area { padding: 15px 10px 25px 10px; display: flex; flex-direction: column; align-items: center; }
+
+.action-row { 
+    display: grid; grid-template-columns: 1fr 2.5fr; gap: 12px; 
+    width: 100%; max-width: 450px; margin-top: 20px; 
 }
 
-.tool-btn:active { background: var(--gold); color: #000; }
-
-.bottom-player-area {
-    background: #000; padding: 20px; display: flex; flex-direction: column;
-    align-items: center; border-top: 2px solid #222;
+.btn-game { 
+    padding: 14px; border-radius: 12px; border: none; 
+    font-weight: 800; cursor: pointer; transition: all 0.2s; 
+    text-transform: uppercase; letter-spacing: 1px;
 }
 
-.action-row { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; width: 100%; max-width: 500px; margin-top: 20px; }
+.btn-game.pass { background: #333; color: #aaa; font-size: 0.9rem; }
+.btn-game.play { 
+    background: var(--gold-linear); color: #000; font-size: 1.1rem; 
+    box-shadow: 0 4px 15px var(--gold-glow);
+}
 
-.btn-game { padding: 18px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; transition: 0.2s; }
-.btn-game.pass { background: #222; color: #fff; }
-.btn-game.play { background: var(--gold); color: #000; font-size: 1.2rem; }
-.btn-game:disabled { opacity: 0.1; filter: grayscale(1); cursor: not-allowed; }
+.btn-game:not(:disabled):active { transform: scale(0.95); opacity: 0.8; }
+.btn-game:disabled { opacity: 0.2; cursor: not-allowed; filter: grayscale(1); }
 
-/* 動畫與遮罩 */
-@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
+/* --- 結算畫面 --- */
 .settlement-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-    z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    backdrop-filter: blur(10px);
+}
+.result-content {
+    background: var(--panel-bg); padding: 40px; border-radius: 30px;
+    border: 1px solid var(--gold); text-align: center;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
 }
 
-.result-title { font-size: 4rem; margin-bottom: 20px; color: var(--gold); text-shadow: 0 0 30px var(--gold-glow); }
-
-@media (max-width: 800px) {
+/* --- 手機版適配 (RWD) --- */
+@media (max-width: 768px) {
     .main-content { grid-template-columns: 1fr; }
-    .side-panel { display: none; }
-    .poker-card { width: 50px; height: 72px; margin-left: -22px; }
+    .side-panel { display: none; } /* 手機版隱藏日誌以增加空間 */
+    
+    .header-nav { padding: 8px 15px; }
+    
+    .poker-card { 
+        width: 55px; height: 80px; 
+        margin-left: -32px; /* 更擠一點以便顯示更多牌 */
+    }
+    
+    .poker-card .val { font-size: 1.2rem; }
+    .poker-card.selected { transform: translateY(-20px) !important; }
+
+    .action-row { max-width: 100%; }
+    .btn-game { padding: 12px; }
+}
+
+/* 針對超小螢幕 (如 iPhone SE) */
+@media (max-width: 375px) {
+    .poker-card { width: 48px; height: 70px; margin-left: -30px; }
+    .quick-tools { overflow-x: auto; justify-content: flex-start; }
+    .tool-btn { flex-shrink: 0; }
 }
